@@ -1,0 +1,29 @@
+import requests
+from bs4 import BeautifulSoup
+
+session = requests.Session()
+
+session.cookies.set('dCMP', 'mafra=1111,all=1,reklama=1,part=0,cpex=1,google=1,gemius=1,id5=1,nase=1111,groupm=1,piano=1,seznam=1,geozo=0,czaid=1,click=1,vendors=full,verze=2,')
+
+path = 'https://www.idnes.cz/oh/olympismus/cov-cesky-olympijsky-tym-novy-partner-innogy.A250909_142041_sport_oh_ipet'
+
+response = session.get(path)
+
+soup = BeautifulSoup(response.content, 'html.parser')
+
+print(soup.find('title'))
+
+
+
+#ps = soup.find_all("p")
+#with open("demofile.txt", "w") as f:
+#  for p in ps:
+#    f.write(p.get_text())
+
+with open("out.txt","w") as f:
+    f.write(title.get_text()+'\n')
+    f.write(time['content']+'\n')
+    f.write(diskuze[0]+'\n')
+    for c in content:
+        f.write(c.get_text(strip=True)+' ')
+    f.write('\n'+str(images))
