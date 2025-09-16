@@ -45,14 +45,14 @@ async def parse_article(session, path):
     return article_stats
 
 
-async def get_urls(limit, concurrency, file):
+async def get_urls(bottom, limit, concurrency, file):
     connector = aiohttp.TCPConnector(limit_per_host=concurrency)
     async with aiohttp.ClientSession(connector=connector, cookies={
         'dCMP': 'mafra=1111,all=1,reklama=1,part=0,cpex=1,google=1,gemius=1,id5=1,nase=1111,groupm=1,piano=1,seznam=1,geozo=0,czaid=1,click=1,vendors=full,verze=2,'
     }) as session:
 
         
-            for page in range(1, limit):
+            for page in range(bottom, bottom+limit):
                 url = f"https://www.idnes.cz/zpravy/archiv/{page}"
                 html = await fetch(session, url)
                 soup = BeautifulSoup(html, "lxml")
@@ -65,19 +65,16 @@ async def get_urls(limit, concurrency, file):
                 tasks = [parse_article(session, href) for href in hrefs]
                 results = await asyncio.gather(*tasks, return_exceptions=True)
                 
-                buffer = []
                 for res in results:
                     if isinstance(res, Exception):
                         print(f"Chyba: {res}")
                     elif res:
-                        buffer.append(json.dumps(res, ensure_ascii=False))
-                if buffer:
-                    file.write("\n".join(buffer) + "\n")
+                        file.write(json.dumps(res, ensure_ascii=False) + "\n")
 
 async def main():
     start = time.time()
     with open("articles.jsonl", "a", encoding="utf-8") as f:
-        await get_urls(10, 100, f)
+        await get_urls(1000, 10, 100, f) #1010 novej začátek
     end = time.time()
     print(f"Trvalo to {end - start:.2f} sekund")
 
