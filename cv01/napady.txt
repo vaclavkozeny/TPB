@@ -27,3 +27,22 @@ with open("out.txt","w") as f:
     for c in content:
         f.write(c.get_text(strip=True)+' ')
     f.write('\n'+str(images))
+
+    print(data)
+with open("data.json", "w", encoding='utf-8') as f:
+    json.dump(data, f)
+
+
+
+    sitemap = session.get('https://www.idnes.cz/zpravy/sitemap')
+mapa = BeautifulSoup(sitemap.content, 'html.parser')
+clanky = mapa.find_all('url')
+for cl in clanky:
+    path = cl.loc.get_text()
+    print(path)
+    if re.search(r'/foto',path):
+        continue
+    if re.search(r'idnes-premium',path):
+        continue
+    d = parse_article(path)
+    data.append(d)
