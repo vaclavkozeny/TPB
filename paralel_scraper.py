@@ -17,20 +17,22 @@ async def parse_article(session, path):
     article_stats = {}
     content = ''
 
-    title = art.find('h1', itemprop='name headline').get_text()
+    title = art.find('h1', itemprop='name headline').get_text(strip=True)
     time_val = art.find('span', class_='time-date')["content"]
 
     diskuze_tag = art.find('a', class_='ico-discusion')
     if diskuze_tag:
-        diskuze_text = diskuze_tag.find('span').get_text()
+        diskuze_text = diskuze_tag.find('span').get_text(strip=True)
         diskuze = int(re.search(r'\d+', diskuze_text).group())
     else:
         diskuze = 0
 
+    opener = art.find('div',class_='opener').get_text(strip=True)
     text = art.find('div', class_='text')
     contents = text.find_all('p')
     for c in contents:
         content += " " + c.get_text(strip=True)
+    content = opener + content
 
     images = len(text.find_all('img')) if text else 0
     tags = [t.get_text(strip=True) for t in art.find('div', class_='tag-list').find_all('a')]
@@ -73,8 +75,8 @@ async def get_urls(bottom, limit, concurrency, file):
 
 async def main():
     start = time.time()
-    with open("articles.jsonl", "a", encoding="utf-8") as f:
-        await get_urls(1000, 10, 100, f) #1010 novej začátek
+    with open("articles-full.jsonl", "a", encoding="utf-8") as f:
+        await get_urls(10377, 1000, 100, f) #9377 bude novej začátek
     end = time.time()
     print(f"Trvalo to {end - start:.2f} sekund")
 
