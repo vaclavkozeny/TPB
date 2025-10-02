@@ -84,6 +84,63 @@ def all_words(data):
     for d in data:
         words += len(d["content"].split())
     return words
+
+
+def most_used_words(data):
+    words = {}
+    for d in data:
+        for w in d["content"].split():
+            if len(w) < 6:
+                continue
+            if(w in words):
+                words[w] += 1
+            else:
+                words[w] = 1
+    return sorted(words.items(), key=lambda item: item[1])[-9:-1]
+
+def covid(data):
+    occurrence = {}
+    for d in data:
+        if not re.search(r'covid-19', d["content"]):
+            continue
+        occurrence[d["title"]] = len(re.findall(r'covid-19', d["content"]))
+    return sorted(occurrence.items(), key=lambda item: item[1])[-4:-1]
+
+def longest_shortest(data):
+    max = 0
+    min = 10000000000
+    max_title = ""
+    min_title = ""
+    for d in data:
+        if(len(d["content"].split()) > max):
+            max = len(d["content"].split())
+            max_title = d["title"]
+        
+        if(len(d["content"].split()) < min):
+            min = len(d["content"].split())
+            min_title = d["title"]
+
+    return {"max":{"title":max_title, "words":max}, "min":{"title":min_title, "words":min}}
+
+def analyze_month(data):
+    articles_per_month = {}
+    for d in data:
+        m = datetime.fromisoformat(d["time"]).month
+        if m in articles_per_month:
+            articles_per_month[m] += 1
+        else:
+            articles_per_month[m] = 1
+    return sorted(articles_per_month.items(), key=lambda item: item[1])[0]
+
+def average_words(data):
+    words = 0
+    leters = 0
+    for d in data:
+        art_words = d["content"].split()
+        words += len(art_words)
+        for w in art_words:
+            leters += len(w)
+    return leters/words
 def main():
     start = time.time()
     data = load_jsonl("articles-clear.jsonl")
@@ -103,7 +160,18 @@ def main():
     #year_2021 = analyze_2021(data)
     #print(year_2021)
 
-    print(all_words(data))
+    #print(all_words(data))
+    
+    # BONUS
+    #print(most_used_words(data))
+
+    #print(covid(data))
+
+    #print(longest_shortest(data))
+
+    print(average_words(data))
+
+    #print(analyze_month(data))
 
     end = time.time()
     print(f"Trvalo to {end - start:.2f} sekund")
