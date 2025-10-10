@@ -163,13 +163,13 @@ def main():
     #print(all_words(data))
     
     # BONUS
-    #print(most_used_words(data))
+    print(most_used_words(data))
 
-    #print(covid(data))
+    print(covid(data))
 
     #print(longest_shortest(data))
 
-    print(average_words(data))
+    #print(average_words(data))
 
     #print(analyze_month(data))
 

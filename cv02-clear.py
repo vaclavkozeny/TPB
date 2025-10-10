@@ -87,7 +87,8 @@ def clear_with_print():
 
 def main():
     start = time.time()
-    clear_data("articles-full.jsonl")
+    #clear_data("articles-full.jsonl")
+    clear_with_print()
     end = time.time()
     print(f"Trvalo to {end - start:.2f} sekund")
 if __name__ == "__main__":
