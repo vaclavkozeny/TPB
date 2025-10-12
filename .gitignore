@@ -1,2 +1,5 @@
 *.json
 *.jsonl
+*.js
+/__pycache__
+Dockerfile
