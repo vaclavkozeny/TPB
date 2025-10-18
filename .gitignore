@@ -3,3 +3,10 @@
 *.js
 /__pycache__
 Dockerfile
+*.yml
+*.rar
+data/
+files/
+ml-100k/
+*.csv
+*.txt
