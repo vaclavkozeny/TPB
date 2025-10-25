@@ -10,3 +10,4 @@ files/
 ml-100k/
 *.csv
 *.txt
+*.png
