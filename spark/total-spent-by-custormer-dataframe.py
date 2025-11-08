@@ -11,7 +11,7 @@ orders = spark.read.option("header", "false").schema(scheme).csv("/files/custome
 
 print("Here is our inferred schema:")
 orders.printSchema()
-orders.groupBy("customerId").agg(round(sum("ammount"), 2).alias("total")).sort("total", ascending=False).show()
+orders.groupBy("customerId").agg(round(sum("ammount"), 2).alias("total_spent")).sort("total_spent", ascending=False).show()
 
 spark.stop()
 
