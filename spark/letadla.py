@@ -5,6 +5,7 @@ from pyspark.ml import Pipeline
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
 from pyspark.sql.functions import when, col
 from pyspark.ml.tuning import ParamGridBuilder, CrossValidator
+from pyspark.ml.classification import RandomForestClassifier
 import time
 
 start = time.time()
@@ -60,6 +61,30 @@ results.select(["prediction","Delay"]).show()
 accuracy = eval_accuracy.evaluate(results)
 
 print(f"Accuracy: {accuracy * 100:.2f} %")
+
+rf = RandomForestClassifier(featuresCol="features", labelCol="Delay", seed=42)
+
+pipeline_rf = Pipeline(stages=[
+    carrier_indexer,
+    carrier_encoder,
+    origin_indexer,
+    origin_encoder,
+    dest_indexer,
+    dest_encoder,
+    assembler,
+    rf 
+])
+
+model_rf = pipeline_rf.fit(train_data)
+results_rf = model_rf.transform(test_data)
+accuracy_rf = eval_accuracy.evaluate(results_rf)
+
+
+# --- SROVNÁNÍ SKÓRE ---
+print("\n--- FINÁLNÍ SROVNÁNÍ ---")
+print(f"Accuracy (Logistic Regression): {accuracy * 100:.2f} %")
+print(f"Accuracy (Random Forest):       {accuracy_rf * 100:.2f} %")
+
 
 spark.stop()
 end = time.time()
