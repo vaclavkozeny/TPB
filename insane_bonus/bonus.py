@@ -55,6 +55,19 @@ table_env.create_temporary_table(
         .build())
 
 table_env.create_temporary_table(
+    'anomalies_sink',
+    TableDescriptor.for_connector("filesystem")
+        .schema(Schema.new_builder()
+                .column('title', DataTypes.STRING())
+                .column('date', DataTypes.TIMESTAMP_LTZ(3))
+                .column('prev_date', DataTypes.TIMESTAMP_LTZ(3))
+                .build())
+        .option("path", "/files/anomalies_analysis.csv")
+        .option("format", "csv")
+        .option("csv.field-delimiter", ";")
+        .build())
+
+table_env.create_temporary_table(
     'window_sink',
     TableDescriptor.for_connector("filesystem")
         .schema(Schema.new_builder()
@@ -96,9 +109,24 @@ windowed_data = selected \
         col("content").like("%válka%").cast(DataTypes.INT()).sum.alias("war_count")
     )
 
+table_env.create_temporary_view("selected", selected)
+
+anomalies = table_env.sql_query("""
+    WITH DataS_Predchozim AS (
+        SELECT
+            title,
+            `date`,
+            LAG(`date`) OVER (ORDER BY received_at) AS prev_date
+        FROM selected
+    )
+    SELECT title, `date`, prev_date
+    FROM DataS_Predchozim
+    WHERE `date` > prev_date
+""")
+
 statement_set = table_env.create_statement_set()
 statement_set.add_insert("comments_sink", active_articles)
-#statement_set.add_insert("anomalies_sink", anomalies)
+statement_set.add_insert("anomalies_sink", anomalies)
 statement_set.add_insert("console_sink", titles_only)
 statement_set.add_insert("window_sink", windowed_data)
 
